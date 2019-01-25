@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>{{ project }}</title>
+<link rel="stylesheet" type="text/css" href="/static/css/multitwitch.css" />
+<link rel="icon" href="/favicon.ico" />
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/jquery-ui.css" />
+<script type="text/javascript" src="/static/js/mustache.js"></script>
+<script type="text/javascript" src="/static/js/multitwitch.js"></script>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36803885-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    absolute_center($("#helpbox"));
+    if ({{ nstreams }} == 0) {
+        hide_chat();
+        $("#helpbox").css('display','block');
+    }
+
+    {% for stream in streams %}
+    streams.push("{{ stream|e }}");
+    {% endfor %}
+
+    // Setup tabs
+    chat_tabs = $("#chatbox").tabs();
+
+    // Do this after all the jqueryui setup.
+    optimize_size({{ nstreams }});
+    setTimeout(function(){
+        optimize_size({{ nstreams }})
+        }, 500);
+});
+$(window).resize(function() {
+    absolute_center($("#helpbox"));
+    optimize_size(-1);
+});
+</script>
+</head>
+<body>
+<div id="wrapper">
+<div id="streams">
+    {% for stream in streams %}
+
+    <iframe id="embed_{{ stream|e }}" src="http://player.twitch.tv/?muted=true&channel={{ stream|e }}" class="stream" allowfullscreen="true"></iframe>
+
+    {% endfor %}
+</div>
+
+<div id="chatbox">
+<ul id="tablist">
+{% for stream in unique_streams %}
+<li><a href="#chat-{{ stream|e }}">{{ stream|e }}</a></li>
+{% endfor %}
+</ul>
+{% for stream in unique_streams %}
+<div id="chat-{{ stream|e }}" class="stream_chat">
+<iframe frameborder="0" scrolling="no" id="chat-{{ stream|e }}-embed" src="http://twitch.tv/chat/embed?channel={{ stream|e }}&amp;popout_chat=true" height="100%" width="100%"></iframe>
+</div>
+{% endfor %}
+</div>
+
+
+<div id="helpbox">
+<h1>MultiTwitch.tv</h1>
+<div id="helptext">
+Welcome to MultiTwitch! You can use this site to watch any number of <a href="http://twitch.tv/">twitch.tv</a> streams at the same time (as long as your computer can handle it). Simply put the streams you want in the url. For example: <a href="/gunnermaniac3/narcissawright">multitwitch.tv/gunnermaniac3/narcissawright</a>. MultiTwitch will optimize the layout of streams to give you the maximum size on each of the streams, while maintaining aspect ratio. For the curious, the source of this page is available at <a href="https://github.com/bhamrick/multitwitch">github.com/bhamrick/multitwitch</a>. Happy streamwatching!
+</div>
+
+<div id="credits">
+Created by Brian Hamrick
+</div>
+</div>
+
+<div id="change_streams" class="optionbox">
+    <div id="streamlist">
+    {% for stream in streams %}
+    <div class="streamlist_item">
+    <input type="checkbox" checked=true class="check" />
+    <span>{{ stream|e }}</span>
+    </div>
+    {% endfor %}
+    <div class="streamlist_item">
+    <input type="text" class="stream_name" onkeyup="stream_item_keyup(event)" />
+    </div>
+    </div>
+
+    <div class="fullwidth centering">
+        <a onclick="add_stream_item()">Add Stream</a>
+    </div>
+
+    <div class="fullwidth">
+    <button type="button" class="left" onclick="close_change_streams(false)">Cancel</button>
+    <button type="button" class="right" onclick="close_change_streams(true)">Ok</button>
+    <div class="clear"></div>
+    </div>
+</div>
+
+<div id="bottom_right_bar">
+<a onclick="change_streams()">Change Streams</a>
+|
+<a onclick="toggle_chat()">Toggle Chat</a>
+</div>
+
+</div>
+</body>
+</html>
